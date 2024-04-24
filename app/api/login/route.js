@@ -10,7 +10,7 @@ export async function POST(req) {
 
     try {
         const [results, temp] = await db.query(
-            `select role_detail_role_id from employee where emp_username = ? and emp_password = ?;`,
+            `select emp_id,role_detail_role_id from employee where emp_username = ? and emp_password = ?;`,
             [username, password]
         );
         await db.end();
@@ -20,7 +20,10 @@ export async function POST(req) {
                 k: process.env.JOSE_SECRET
             }
             const secretKey = await importJWK(secretJWT, 'HS256')
-            const token = await new SignJWT({ role: results[0].role_detail_role_id })
+            const token = await new SignJWT({
+                role: results[0].role_detail_role_id,
+                emp_id: results[0].emp_id,
+            })
                 .setProtectedHeader({ alg: 'HS256' })
                 .setIssuedAt()
                 .setExpirationTime('1h')

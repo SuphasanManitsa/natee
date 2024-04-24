@@ -6,7 +6,7 @@ import { CookiesProvider } from 'next-client-cookies/server';
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" data-theme="">
+    <html lang="en" data-theme="light">
       <body>
         <Logout />
         <Suspense fallback={<Loading />}>

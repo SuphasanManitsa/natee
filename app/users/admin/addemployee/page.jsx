@@ -95,9 +95,6 @@ export default function page() {
             <hr />
             <form action={addemp}>
                 <div className="mt-5">
-                    <p className='text-2xl font-bold'>รหัสพนักงาน :</p> <input type="text" name="idemp" placeholder="ใส่รหัสพนักงาน E0000" className="mt-3 input input-bordered input-info w-full max-w-xs" />
-                </div>
-                <div className="mt-5">
                     <p className='text-2xl font-bold'>ชื่อพนักงาน :</p> <input type="text" name="nameemp" placeholder="นทีเทพซ่า" className="mt-3 input input-bordered input-info w-full max-w-xs" />
                 </div>
                 <div className="mt-5">
