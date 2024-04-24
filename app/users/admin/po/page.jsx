@@ -111,7 +111,11 @@ export default function page() {
                                     <td>{data.emp_name}</td>
                                     <td>{data.customers_c_id}</td>
                                     <td>{data.c_name}</td>
-                                    <td>{data.status === 0 ? 'ยังไม่เสร็จ' : data.status === 1 ? 'เสร็จแล้ว' : ''}</td>
+                                    <td className={`${data.status === 0 ? 'text-red-500' : data.status === 1 ? 'text-green-500' : ''}`}>
+                                        {data.status === 0 ? 'ยังไม่เสร็จ' : data.status === 1 ? 'เสร็จแล้ว' : ''}
+                                    </td>
+
+
                                 </tr>
                             ))
                         }

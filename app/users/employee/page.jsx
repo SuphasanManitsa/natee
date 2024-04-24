@@ -75,7 +75,7 @@ export default function page() {
                         {
                             filteredData.map((data, index) => (
                                 <tr key={index} className='text-center'>
-                                    <Link href={`/users/employee/${index + 1}`}>
+                                    <Link href={`/users/employee/${data.po_id}`}>
                                         <td>{data.po_id}</td>
                                         <td>{data.c_name}</td>
                                         <td>{data.status === 0 ? 'ยังไม่เสร็จ' : data.status === 1 ? 'เสร็จแล้ว' : ''}</td>
