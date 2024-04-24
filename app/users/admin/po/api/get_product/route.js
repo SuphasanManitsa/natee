@@ -3,7 +3,7 @@ import connectDB from "@/app/api/connectDB";
 
 export async function GET() {
     const db = await connectDB();
-    const [rows, fields] = await db.query("select emp_id,emp_name from employee where role_detail_role_id = 2;")
+    const [rows, fields] = await db.query("select p_id,p_name from product;")
     await db.end();
     return NextResponse.json(rows)
 }

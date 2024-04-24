@@ -11,7 +11,7 @@ export default function page() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await fetch("http://localhost:3000/users/employee/api");
+                const response = await fetch(`${process.env.NEXT_PUBLIC_IP}/users/employee/api`);
                 if (!response.ok) {
                     throw new Error("Failed to fetch data");
                 }
@@ -69,17 +69,17 @@ export default function page() {
                             <th className='font-bold text-xl'>ไอดีใบ PO</th>
                             <th className='font-bold text-xl'>ชื่อลูกค้า</th>
                             <th className='font-bold text-xl'>สเตตัส</th>
+                            <th className='font-bold text-xl'>รายละเอียด</th>
                         </tr>
                     </thead>
                     <tbody>
                         {
                             filteredData.map((data, index) => (
                                 <tr key={index} className='text-center'>
-                                    <Link href={`/users/employee/${data.po_id}`}>
-                                        <td>{data.po_id}</td>
-                                        <td>{data.c_name}</td>
-                                        <td>{data.status === 0 ? 'ยังไม่เสร็จ' : data.status === 1 ? 'เสร็จแล้ว' : ''}</td>
-                                    </Link>
+                                    <td>{data.po_id}</td>
+                                    <td>{data.c_name}</td>
+                                    <td>{data.status === 0 ? 'ยังไม่เสร็จ' : data.status === 1 ? 'เสร็จแล้ว' : ''}</td>
+                                    <td><Link className='btn btn-info text-white' href={`/users/employee/${data.po_id}`}>ดูข้อมูล</Link></td>
                                 </tr>
                             ))
                         }

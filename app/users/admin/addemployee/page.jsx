@@ -11,7 +11,7 @@ export default function page() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await fetch("http://localhost:3000/users/admin/addemployee/api");
+                const response = await fetch(`${process.env.NEXT_PUBLIC_IP}/users/admin/addemployee/api`);
                 if (!response.ok) {
                     throw new Error("Failed to fetch data");
                 }
