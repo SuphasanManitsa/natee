@@ -1,34 +1,24 @@
-import fs from 'fs/promises';
+import { NextResponse } from "next/server";
+import connectDB from "@/app/api/connectDB";
 
-export const config = {
-  api: {
-    bodyParser: false, // Disable body parsing for raw file data
-  },
-};
-
-const handler = async (req, res) => {
-  if (req.method !== 'POST') {
-    return res.status(405).json({ message: 'Method Not Allowed' });
-  }
-
-  const file = req.body; // Access the file data from the request body
-
-  // File validation (replace with your validation logic)
-  if (!file.type.startsWith('image/')) {
-    return res.status(400).json({ message: 'Invalid file type' });
-  }
-
-  // Generate unique filename
-  const fileName = `${Date.now()}-${file.name}`;
-  const filePath = `uploads/${fileName}`; // Define upload directory
-
+export async function POST(req) {
+  const request = await req.json();
+  
+  // console.log(request.image);
+  // console.log(request.formData);
   try {
-    await fs.writeFile(filePath, file.data); // Save the file
-    return res.status(200).json({ message: 'File uploaded successfully' });
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({ message: 'Upload failed' });
-  }
-};
+    const db = await connectDB();
+    const [p_id, temps] = await db.query(`SELECT CONCAT('P', LPAD(SUBSTRING(p_id, 2) + 1, 4, '0')) AS p_id
+    FROM product
+    ORDER BY p_id DESC
+    LIMIT 1;`);
+    console.log([p_id[0].p_id,request.formData.p_name,request.formData.p_storage,request.formData.quantity,request.image]);
+    const temp = await db.execute('INSERT INTO product (p_id,p_name,p_storage,quantity,p_image) VALUES (?,?,?,?,?);',
+    [p_id[0].p_id,request.formData.p_name,request.formData.p_storage,request.formData.quantity,request.image]);
+    await db.end();
 
-export default handler;
+    return NextResponse.json({ OK: "OK" })
+  } catch (error) {
+    console.error("Error uploading image: ", error);
+  }
+}

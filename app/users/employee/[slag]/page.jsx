@@ -46,6 +46,22 @@ export default function page({ params }) {
         })
     }
 
+    async function handleClickCheckbox(index, orderStatus) {
+        const newData = [...mydata]; // สร้างข้อมูลใหม่จากข้อมูลเดิม
+        newData[index].order_status = orderStatus === 1 ? 0 : 1; // สลับค่า order_status
+        setMyData(newData); // อัปเดตข้อมูลใหม่ใน state
+
+        try {
+            const response = await axios.post(`${process.env.NEXT_PUBLIC_IP}/users/employee/[slag]/api/onchange`, {
+                data: mydata,
+            });
+            console.log(response.data);
+        } catch (error) {
+            console.error("Error fetching data:", error);
+        }
+        
+    };
+
     return (
         <div className="container">
             <p className='text-4xl my-3  font-bold'>การจัดการข้อมูลพนักงาน</p>
@@ -71,15 +87,19 @@ export default function page({ params }) {
                         </tr>
                     </thead>
                     <tbody>
-                        {
-                            mydata.map((data, index) => (
-                                <tr key={index} className='text-center'>
-                                    <td>{data.p_name}</td>
-                                    <td>{data.quantity}</td>
-                                    <td>{data.order_status === 0 ? 'ยังไม่เสร็จ' : data.order_status === 1 ? 'เสร็จแล้ว' : ''}</td>
-                                </tr>
-                            ))
-                        }
+                        {mydata.map((data, index) => (
+                            <tr key={index} className='text-center'>
+                                <td>{data.p_name}</td>
+                                <td>{data.quantity}</td>
+                                <td>
+                                    <input
+                                        type="checkbox"
+                                        checked={data.order_status === 1}
+                                        onChange={() => handleClickCheckbox(index, data.order_status)}
+                                    />
+                                </td>
+                            </tr>
+                        ))}
                     </tbody>
 
                 </table>
