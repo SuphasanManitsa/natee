@@ -75,7 +75,9 @@ export default function page({ params }) {
                                 <tr key={index} className='text-center'>
                                     <td>{data.p_name}</td>
                                     <td>{data.quantity}</td>
-                                    <td>{data.order_status === 0 ? 'ยังไม่เสร็จ' : data.order_status === 1 ? 'เสร็จแล้ว' : ''}</td>
+                                    <td className={`${data.order_status === 0 ? 'text-red-500' : data.order_status === 1 ? 'text-green-500' : ''}`}>
+                                        <td>{data.order_status === 0 ? 'ยังไม่เสร็จ' : data.order_status === 1 ? 'เสร็จแล้ว' : ''}</td>
+                                    </td>
                                 </tr>
                             ))
                         }
