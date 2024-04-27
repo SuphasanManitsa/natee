@@ -1,9 +1,9 @@
-import Product from "@/app/components/product"
+import Logout from "../components/logout"
 
 export default function Page() {
     return (
         <div>
-            <Product productId={'P0035'} />
+            <Logout />
         </div>
     )
 }

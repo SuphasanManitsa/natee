@@ -40,9 +40,9 @@ export default function Product(value) {
     }, [])
     // console.log(product.p_image.data);
     return (
-        <div>
+        <div className="mx-auto max-w-lg p-8 bg-white rounded-lg shadow-lg">
             <div className="mt-5">
-                <p className='text-2xl font-bold'>ชื่อสินค้า:
+                <p className='text-2xl font-bold'>รูปสินค้า:
                     {image && (
                         <img src={`data:image/png;base64,${image}`} alt="Uploaded Image" />
                     )}
@@ -61,5 +61,6 @@ export default function Product(value) {
                 <p className='text-2xl font-bold'>จำนวน: {product.quantity}</p>
             </div>
         </div>
+
     );
 }
