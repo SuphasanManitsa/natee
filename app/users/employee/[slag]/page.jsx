@@ -84,6 +84,7 @@ export default function page({ params }) {
                             <th className='font-bold text-xl'>ชื่่อสินค้า</th>
                             <th className='font-bold text-xl'>จำนวนสินค้า</th>
                             <th className='font-bold text-xl'>สเตตัส</th>
+                            <td className='font-bold text-xl'>รายละเอียด</td>
                         </tr>
                     </thead>
                     <tbody>
@@ -98,6 +99,7 @@ export default function page({ params }) {
                                         onChange={() => handleClickCheckbox(index, data.order_status)}
                                     />
                                 </td>
+                                <td><Link className='btn btn-info text-white' href={`/users/employee/${params.slag}/${data.product_p_id}`}>ดูข้อมูล</Link></td>
                             </tr>
                         ))}
                     </tbody>

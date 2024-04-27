@@ -1,9 +1,9 @@
 import Product from "@/app/components/product"
 
-export default function Page() {
+export default function page({ params }) {
     return (
         <div>
-            <Product productId={'P0035'} />
+            <Product productId={params.slate} />
         </div>
     )
 }

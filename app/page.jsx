@@ -1,36 +1,47 @@
-'use client'
-import { login } from './action';
-import { useFormState } from 'react-dom';
-import { useCookies } from 'next-client-cookies';
-import { useRouter } from 'next/navigation'
+"use client";
+import { login } from "./action";
+import { useFormState } from "react-dom";
+import { useCookies } from "next-client-cookies";
+import { useRouter } from "next/navigation";
 
 export default function Page() {
-    try {
-        const router = useRouter()
-        const cookies = useCookies();
-        if (cookies.get('token') != null) {
-            router.push('/users/admin')
-        }
-    } catch (error) {
-        console.log('redirec login page error');
+  try {
+    const router = useRouter();
+    const cookies = useCookies();
+    if (cookies.get("token") != null) {
+      router.push("/users/admin");
     }
-    const initState = {
-        massage: ''
-    }
-    const [state, formAction] = useFormState(login, initState);
-    return (
-        <div className="bg-yellow-400">
-            <div className='flex justify-center flex-col items-center min-h-screen'>
-                <form action={formAction} className='flex flex-col'>
-                    <div className='text-center mb-10 text-6xl'>Login !!</div>
-                    Username <input name="username" />
-                    Password <input name="password" />
-                    <button className='bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold mt-4 py-2 px-4 items-center rounded-md'>Submit</button>
-                </form>
-                <div className='text-red-600'>
-                    {state.massage}
-                </div>
-            </div>
-        </div>
-    );
+  } catch (error) {
+    console.log("redirec login page error");
+  }
+  const initState = {
+    massage: "",
+  };
+  const [state, formAction] = useFormState(login, initState);
+  return (
+    <div className="container">
+      <div className="w-full flex flex-col justify-center">
+        <div className="text-center text-6xl">Tokoderu Foods</div>
+        <p className="mt-3 text-center">Product Management web-application</p>
+        <form action={formAction} className="flex flex-col my-3 items-center">
+          <div className="mt-2 flex flex-col justify-center">
+            <p>Username : </p>
+            <input
+              name="username"
+              className="input input-bordered input-info w-full max-w-xs mt-3"
+            />
+          </div>
+          <div className="mt-2 flex flex-col justify-center">
+            <p>Password : </p>
+            <input
+              name="password"
+              className="input input-bordered input-info w-full max-w-xs mt-3"
+            />
+          </div>
+          <button className="btn btn-info text-white mt-3">Submit</button>
+          <div className="text-red-600">{state.massage}</div>
+        </form>
+      </div>
+    </div>
+  );
 }

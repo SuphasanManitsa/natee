@@ -12,11 +12,11 @@ export async function POST(req) {
   const request = await req.json();
   // console.log(request.key);
   const DB = await connectDB();
-  const [poid, temp] = await DB.query(`select po_id + 1 as po_id from purchase_order order by po_id desc limit 1;`);
-  // console.log(poid[0].po_id);
+  const [poid, temp] = await DB.query(`SELECT COALESCE(MAX(po_id) + 1, 1) AS po_id FROM purchase_order;`);
 
+  
   const ok = await DB.execute(`INSERT INTO purchase_order (po_id, po_date, employee_emp_id, customers_c_id,status)
-    VALUES (?, now(), ?, ?,?)
+  VALUES (?, now(), ?, ?,?)
   `, [poid[0].po_id, request.key[0].empid, request.key[0].cid, 0]);
   await DB.end();
 
@@ -24,14 +24,20 @@ export async function POST(req) {
   for (let index = 0; index < request.key[1].length; index++) {
     const DB = await connectDB();
     
-    const [order_id, temp] = await DB.query('select order_id + 1 as order_id from `order` order by order_id desc limit 1;');
+    console.log("ppppppppppppppppppppppppp");
+    const [order_id, temp] = await DB.query('SELECT COALESCE(MAX(order_id) + 1, 1) AS order_id FROM `order`;');
     
-    console.log([order_id[0].order_id, request.key[1][index].p_id, poid[0].po_id, request.key[1][index].quantity, 0]);
+    console.log("ppppppppppppppppppppppppp");
+    // console.log([order_id[0].order_id, request.key[1][index].p_id, poid[0].po_id, request.key[1][index].quantity, 0]);
     
     const rows = await DB.execute('INSERT INTO `order` (order_id,product_p_id,purchase_order_po_id,quantity,order_status) VALUES(?,?,?,?,?);',
-      [order_id[0].order_id, request.key[1][index].p_id, poid[0].po_id, request.key[1][index].quantity, 0]);
-    console.log("ok");
-    
+    [order_id[0].order_id, request.key[1][index].p_id, poid[0].po_id, request.key[1][index].quantity, 0]);
+    console.log("ppppppppppppppppppppppppp");
+
+    const rowseiei = await DB.execute('update product set quantity = quantity - ? where p_id = ?;',
+      [request.key[1][index].quantity, request.key[1][index].p_id]);
+
+
     await DB.end();
 
   }

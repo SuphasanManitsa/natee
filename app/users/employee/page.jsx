@@ -94,9 +94,6 @@ export default function page() {
                 <button type='submit' className='btn btn-info text-white mt-5' onClick={handleClick}>ส่ง</button>
                 <button type='reset' className='btn btn-info text-white mx-5'>reset</button>
             </form>
-            <div className="flex justify-center">
-                <Link href="../admin"><button className='btn btn-info my-5 text-white px-40'>ย้อนกลับ</button></Link>
-            </div>
         </div>
     )
 }

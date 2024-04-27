@@ -7,7 +7,7 @@ export default function Product(value) {
     const { productId } = value;
 
     const [product, setProduct] = useState([])
-    const [base64String, setBase64String] = useState('')
+    const [image, setImage] = useState('')
 
 
     useEffect(() => {
@@ -17,42 +17,15 @@ export default function Product(value) {
                 const response = await axios.post(`${process.env.NEXT_PUBLIC_IP}/api/getproduct`, {
                     value: productId,
                 });
-                console.log(response.data);
-                console.log(response.data.p_image.data);
-                const hee = response.data.p_image.data.toString('base64');
-                console.log(`data:image/png;base64,${hee}`);
-                // setImage(response.data.p_image.data)
-                // const blob = new Blob([new Uint8Array(response.data.p_image.data)], { type: 'image/png' });
-                // const imageUrl = URL.createObjectURL(blob);
-                // console.log(imageUrl);
+                setProduct(response.data)
 
+                const arrayBuffer = response.data.p_image.data;
+                const uint8Array = new Uint8Array(arrayBuffer);
+                const buffer = Buffer.from(uint8Array);
+                const base64String = buffer.toString('base64');
 
+                setImage(base64String)
 
-
-
-
-
-
-
-
-
-
-
-                // const blob = new Blob([new Uint8Array(response.data.p_image.data)], { type: 'image/png' });
-                // // Create a URL for the Blob object
-                // const imageUrl = URL.createObjectURL(blob);
-
-                // // Update state with the image URL
-                // setImage(imageUrl);
-
-                // const reader = new FileReader();
-                // reader.readAsDataURL(response.data.p_image);
-                // reader.onloadend = () => {
-                //     const base64Data = reader.result;
-                //     console.log(base64Data);
-                //     setBase64Data(base64Data);
-                //     // Use the base64Data in your JSX
-                // };
             } catch (error) {
                 console.error("Error fetching data:", error);
             }
@@ -69,9 +42,11 @@ export default function Product(value) {
     return (
         <div>
             <div className="mt-5">
-                {/* {image && <img src={`data:image/png;base64,${Buffer.from(image).toString('base64')}`} alt="Product Image" />}
-            {`data:image/png;base64,${Buffer.from(image).toString('base64')}`} */}
-            <img src={base64String} alt="sdf" />
+                <p className='text-2xl font-bold'>ชื่อสินค้า:
+                    {image && (
+                        <img src={`data:image/png;base64,${image}`} alt="Uploaded Image" />
+                    )}
+                </p>
             </div>
             <div className="mt-5">
                 <p className='text-2xl font-bold'>ชื่อสินค้า: {product.p_id}</p>

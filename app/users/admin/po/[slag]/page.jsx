@@ -67,6 +67,7 @@ export default function page({ params }) {
                             <th className='font-bold text-xl'>ชื่่อสินค้า</th>
                             <th className='font-bold text-xl'>จำนวนสินค้า</th>
                             <th className='font-bold text-xl'>สเตตัส</th>
+                            <td className='font-bold text-xl'>รายละเอียด</td>
                         </tr>
                     </thead>
                     <tbody>
@@ -78,6 +79,7 @@ export default function page({ params }) {
                                     <td className={`${data.order_status === 0 ? 'text-red-500' : data.order_status === 1 ? 'text-green-500' : ''}`}>
                                         <td>{data.order_status === 0 ? 'ยังไม่เสร็จ' : data.order_status === 1 ? 'เสร็จแล้ว' : ''}</td>
                                     </td>
+                                    <td><Link className='btn btn-info text-white' href={`/users/admin/po/${params.slag}/${data.p_id}`}>ดูข้อมูล</Link></td>
                                 </tr>
                             ))
                         }

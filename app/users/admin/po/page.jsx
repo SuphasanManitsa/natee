@@ -176,6 +176,7 @@ export default function page() {
                             <td className='font-bold text-xl'>รหัสลูกค้า</td>
                             <td className='font-bold text-xl'>ชื่อร้านค้า</td>
                             <td className='font-bold text-xl'>สเตตัส</td>
+                            <td className='font-bold text-xl'>รายละเอียด</td>
                         </tr>
                     </thead>
 
