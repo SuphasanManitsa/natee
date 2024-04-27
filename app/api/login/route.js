@@ -29,9 +29,9 @@ export async function POST(req) {
                 .setExpirationTime('5h')
                 .sign(secretKey)
             cookies().set('token',token)
-            console.log(token);
+            // console.log(token);
             return NextResponse.json({
-                massess: token,
+                message: token,
             });
         } else {
             return NextResponse.json({
