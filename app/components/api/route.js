@@ -21,10 +21,9 @@ export async function POST(req) {
             message: results[0].emp_username,
         });
         
-        // if (results[0].role_detail_role_id == 1 || results[0].role_detail_role_id == 2) {
     }
     catch (err) {
-        // console.log(err);
+        console.log(err);
         return NextResponse.json({
             message: "fail",
         });

@@ -10,7 +10,6 @@ export async function GET() {
 
 export async function POST(req) {
   const request = await req.json();
-  // console.log(request.key);
   const DB = await connectDB();
   const [poid, temp] = await DB.query(`SELECT COALESCE(MAX(po_id) + 1, 1) AS po_id FROM purchase_order;`);
 
@@ -24,15 +23,10 @@ export async function POST(req) {
   for (let index = 0; index < request.key[1].length; index++) {
     const DB = await connectDB();
     
-    console.log("ppppppppppppppppppppppppp");
     const [order_id, temp] = await DB.query('SELECT COALESCE(MAX(order_id) + 1, 1) AS order_id FROM `order`;');
-    
-    console.log("ppppppppppppppppppppppppp");
-    // console.log([order_id[0].order_id, request.key[1][index].p_id, poid[0].po_id, request.key[1][index].quantity, 0]);
     
     const rows = await DB.execute('INSERT INTO `order` (order_id,product_p_id,purchase_order_po_id,quantity,order_status) VALUES(?,?,?,?,?);',
     [order_id[0].order_id, request.key[1][index].p_id, poid[0].po_id, request.key[1][index].quantity, 0]);
-    console.log("ppppppppppppppppppppppppp");
 
     const rowseiei = await DB.execute('update product set quantity = quantity - ? where p_id = ?;',
       [request.key[1][index].quantity, request.key[1][index].p_id]);
@@ -42,6 +36,5 @@ export async function POST(req) {
 
   }
 
-  // return NextResponse.json(rows)
   return NextResponse.json({ OK: "OK" })
 }

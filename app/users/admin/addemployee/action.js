@@ -14,14 +14,10 @@ export async function addemp(formData) {
     FROM employee
     ORDER BY emp_id DESC
     LIMIT 1;`);
-  console.log(emp_id[0].new_emp_id);
-
   const rows = await db.execute(`
     INSERT INTO employee (emp_id, emp_name, emp_username, emp_password, role_detail_role_id)
     VALUES (?, ?, ?, ?, ?)
   `, [emp_id[0].new_emp_id, nameemp, useremp, passwordemp, roleemp]);
 
   await db.end();
-
-  console.log(rows);
 }

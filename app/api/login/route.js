@@ -4,6 +4,7 @@ import { SignJWT, importJWK } from 'jose';
 import { cookies } from 'next/headers';
 
 export async function POST(req) {
+
     const { username, password } = await req.json();
 
     const db = await connectDB();
@@ -14,6 +15,8 @@ export async function POST(req) {
             [username, password]
         );
         await db.end();
+
+
         if (results[0].role_detail_role_id == 1 || results[0].role_detail_role_id == 2) {
             const secretJWT = {
                 kty: 'oct',
@@ -24,12 +27,11 @@ export async function POST(req) {
                 role: results[0].role_detail_role_id,
                 emp_id: results[0].emp_id,
             })
-                .setProtectedHeader({ alg: 'HS256' })
-                .setIssuedAt()
-                .setExpirationTime('5h')
-                .sign(secretKey)
+            .setProtectedHeader({ alg: 'HS256' })
+            .setIssuedAt()
+            .setExpirationTime('5h')
+            .sign(secretKey)
             cookies().set('token',token)
-            // console.log(token);
             return NextResponse.json({
                 message: token,
             });
@@ -40,7 +42,7 @@ export async function POST(req) {
         }
     }
     catch (err) {
-        // console.log(err);
+        console.log(err);
         return NextResponse.json({
             message: "fail",
         });

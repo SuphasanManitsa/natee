@@ -1,35 +1,35 @@
 'use client'
 import React, { useState, useEffect } from 'react'
-import { addemp } from './action'
 import Swal from 'sweetalert2'
 import Link from 'next/link'
 import axios from 'axios'
+import { io } from 'socket.io-client';
+
+const socket = io();
 
 export default function page({ params }) {
     const [mydata, setMyData] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
 
+    async function fetchData() {
+        try {
+            const response = await axios.post(`${process.env.NEXT_PUBLIC_IP}/users/admin/po/[slag]/api`, {
+                po_id: params.slag,
+            });
+            const newData = response.data;
+            setMyData(newData);
+        } catch (error) {
+            console.error("Error fetching data:", error);
+        }
+    }
     useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const response = await axios.post(`${process.env.NEXT_PUBLIC_IP}/users/admin/po/[slag]/api`, {
-                    po_id: params.slag,
-                });
-                const newData = response.data
-                console.log(newData);
-                console.log("plplplplplplplplplplplpl");
-                setMyData(newData);
-            } catch (error) {
-                console.error("Error fetching data:", error);
-            }
-        };
-
-        // เรียกใช้ fetchData ทุกๆ 3 วินาที
-        const interval = setInterval(fetchData, 3000);
-
-        return () => {
-            clearInterval(interval); // เมื่อ component unmount ให้หยุดการเรียก fetchData
-        };
+        fetchData();
+        socket.on("receive_employee", (message) => {
+            fetchData();
+          });
+          return () => {
+            socket.off("receive_employee");
+          };
     }, []);
 
     const handleSearch = (event) => {
@@ -77,7 +77,7 @@ export default function page({ params }) {
                                     <td>{data.p_name}</td>
                                     <td>{data.quantity}</td>
                                     <td className={`${data.order_status === 0 ? 'text-red-500' : data.order_status === 1 ? 'text-green-500' : ''}`}>
-                                        <td>{data.order_status === 0 ? 'ยังไม่เสร็จ' : data.order_status === 1 ? 'เสร็จแล้ว' : ''}</td>
+                                        {data.order_status === 0 ? 'ยังไม่เสร็จ' : data.order_status === 1 ? 'เสร็จแล้ว' : ''}
                                     </td>
                                     <td><Link className='btn btn-info text-white' href={`/users/admin/po/${params.slag}/${data.p_id}`}>ดูข้อมูล</Link></td>
                                 </tr>

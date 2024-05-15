@@ -1,33 +1,36 @@
 'use client'
 import React, { useState, useEffect } from 'react'
-import { addemp } from './action'
 import Swal from 'sweetalert2'
 import Link from 'next/link'
+import { io } from 'socket.io-client';
+
+const socket = io();
 
 export default function page() {
     const [mydata, setMyData] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
 
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const response = await fetch(`${process.env.NEXT_PUBLIC_IP}/users/employee/api`);
-                if (!response.ok) {
-                    throw new Error("Failed to fetch data");
-                }
-                const newData = await response.json();
-                setMyData(newData);
-            } catch (error) {
-                console.error("Error fetching data:", error);
+    async function fetchData() {
+        try {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_IP}/users/employee/api`);
+            if (!response.ok) {
+                throw new Error("Failed to fetch data");
             }
-        };
+            const newData = await response.json();
+            setMyData(newData);
+        } catch (error) {
+            console.error("Error fetching data:", error);
+        }
+    }
 
-        // เรียกใช้ fetchData ทุกๆ 3 วินาที
-        const interval = setInterval(fetchData, 3000);
-
-        return () => {
-            clearInterval(interval); // เมื่อ component unmount ให้หยุดการเรียก fetchData
-        };
+    useEffect(() => {
+        fetchData();
+        socket.on("receive_employee", (message) => {
+            fetchData();
+          });
+          return () => {
+            socket.off("receive_employee");
+          };
     }, []);
 
     const handleSearch = (event) => {
@@ -37,15 +40,6 @@ export default function page() {
     const filteredData = mydata.filter((data) => {
         return Object.values(data).join(" ").toLowerCase().includes(searchTerm.toLowerCase());
     });
-
-    const handleClick = () => {
-        Swal.fire({
-            title: 'ส่งสำเร็จ!',
-            text: 'กด OK เพื่อดำเนินการต่อ',
-            icon: 'success',
-            confirmButtonText: 'OK'
-        })
-    }
 
     return (
         <div className="container">
@@ -78,7 +72,9 @@ export default function page() {
                                 <tr key={index} className='text-center'>
                                     <td>{data.po_id}</td>
                                     <td>{data.c_name}</td>
-                                    <td>{data.status === 0 ? 'ยังไม่เสร็จ' : data.status === 1 ? 'เสร็จแล้ว' : ''}</td>
+                                    <td className={`${data.status === 0 ? 'text-red-500' : data.status === 1 ? 'text-green-500' : ''}`}>
+                                        {data.status === 0 ? 'ยังไม่เสร็จ' : data.status === 1 ? 'เสร็จแล้ว' : ''}
+                                    </td>
                                     <td><Link className='btn btn-info text-white' href={`/users/employee/${data.po_id}`}>ดูข้อมูล</Link></td>
                                 </tr>
                             ))
@@ -87,13 +83,6 @@ export default function page() {
 
                 </table>
             </div>
-
-
-
-            <form action={addemp}>
-                <button type='submit' className='btn btn-info text-white mt-5' onClick={handleClick}>ส่ง</button>
-                <button type='reset' className='btn btn-info text-white mx-5'>reset</button>
-            </form>
         </div>
     )
 }

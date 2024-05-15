@@ -12,7 +12,7 @@ export default function Page() {
       router.push("/users/admin");
     }
   } catch (error) {
-    console.log("redirec login page error");
+    console.log(error);
   }
   const initState = {
     massage: "",

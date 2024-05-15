@@ -9,36 +9,28 @@ export default function Product(value) {
     const [product, setProduct] = useState([])
     const [image, setImage] = useState('')
 
+    async function fetchData() {
+        try {
+            const response = await axios.post(`${process.env.NEXT_PUBLIC_IP}/api/getproduct`, {
+                value: productId,
+            });
+            setProduct(response.data)
+
+            const arrayBuffer = response.data.p_image.data;
+            const uint8Array = new Uint8Array(arrayBuffer);
+            const buffer = Buffer.from(uint8Array);
+            const base64String = buffer.toString('base64');
+
+            setImage(base64String)
+
+        } catch (error) {
+            console.error("Error fetching data:", error);
+        }
+    }
 
     useEffect(() => {
-        const fetchData = async () => {
-
-            try {
-                const response = await axios.post(`${process.env.NEXT_PUBLIC_IP}/api/getproduct`, {
-                    value: productId,
-                });
-                setProduct(response.data)
-
-                const arrayBuffer = response.data.p_image.data;
-                const uint8Array = new Uint8Array(arrayBuffer);
-                const buffer = Buffer.from(uint8Array);
-                const base64String = buffer.toString('base64');
-
-                setImage(base64String)
-
-            } catch (error) {
-                console.error("Error fetching data:", error);
-            }
-        };
-
-        // เรียกใช้ fetchData ทุกๆ 3 วินาที
-        const interval = setInterval(fetchData, 3000);
-
-        return () => {
-            clearInterval(interval); // เมื่อ component unmount ให้หยุดการเรียก fetchData
-        };
+        fetchData();
     }, [])
-    // console.log(product.p_image.data);
     return (
         <div className="mx-auto max-w-lg p-8 bg-white rounded-lg shadow-lg">
             <div className="mt-5">

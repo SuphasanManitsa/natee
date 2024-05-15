@@ -3,6 +3,9 @@ import React, { useState, useEffect } from 'react'
 import Swal from 'sweetalert2'
 import Link from 'next/link'
 import axios from 'axios'
+import { io } from 'socket.io-client';
+
+const socket = io();
 
 export default function page() {
 
@@ -13,64 +16,60 @@ export default function page() {
     const [searchTerm, setSearchTerm] = useState('');
     const [dataintable, setaDataintable] = useState([]);
 
+    async function fetchData() {
+        try {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_IP}/users/admin/po/api`);
+            if (!response.ok) {
+                throw new Error("Failed to fetch data");
+            }
+            const newData = await response.json();
+            setMyData(newData);
+        } catch (error) {
+            console.error("Error fetching data:", error);
+        }
+    }
+    async function fetchMetaData() {
+        try {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_IP}/users/admin/po/api/get_customer`);
+            if (!response.ok) {
+                throw new Error("Failed to fetch data");
+            }
+            const tempdata = await response.json();
+            setCustomers(tempdata);
+        } catch (error) {
+            console.error("Error fetching data:", error);
+        }
+
+        try {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_IP}/users/admin/po/api/get_employee`);
+            if (!response.ok) {
+                throw new Error("Failed to fetch data");
+            }
+            const tempdata = await response.json();
+            setEmployees(tempdata);
+        } catch (error) {
+            console.error("Error fetching data:", error);
+        }
+        try {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_IP}/users/admin/po/api/get_product`);
+            if (!response.ok) {
+                throw new Error("Failed to fetch data");
+            }
+            const tempdata = await response.json();
+            setProduct(tempdata);
+        } catch (error) {
+            console.error("Error fetching data:", error);
+        }
+    }
+
     useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const response = await fetch(`${process.env.NEXT_PUBLIC_IP}/users/admin/po/api`);
-                if (!response.ok) {
-                    throw new Error("Failed to fetch data");
-                }
-                const newData = await response.json();
-                setMyData(newData);
-            } catch (error) {
-                console.error("Error fetching data:", error);
-            }
-
-            try {
-                const response = await fetch(`${process.env.NEXT_PUBLIC_IP}/users/admin/po/api/get_customer`);
-                if (!response.ok) {
-                    throw new Error("Failed to fetch data");
-                }
-                const tempdata = await response.json();
-                setCustomers(tempdata);
-            } catch (error) {
-                console.error("Error fetching data:", error);
-            }
-
-            try {
-                const response = await fetch(`${process.env.NEXT_PUBLIC_IP}/users/admin/po/api/get_employee`);
-                if (!response.ok) {
-                    throw new Error("Failed to fetch data");
-                }
-                const tempdata = await response.json();
-                setEmployees(tempdata);
-            } catch (error) {
-                console.error("Error fetching data:", error);
-            }
-            try {
-                const response = await fetch(`${process.env.NEXT_PUBLIC_IP}/users/admin/po/api/get_product`);
-                if (!response.ok) {
-                    throw new Error("Failed to fetch data");
-                }
-                const tempdata = await response.json();
-                setProduct(tempdata);
-            } catch (error) {
-                console.error("Error fetching data:", error);
-            }
-
-
-            // setTheArray(oldArray => [...oldArray, newElement]);
-            // setQty(qty => [...qty, newElement]);
-            // ทดสอบแสดงค่าข้อมูลใน console
-
-            console.log("ttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttt");
-        };
-
-        // เรียกใช้ fetchData ทุกๆ 3 วินาที
-        const interval = setInterval(fetchData, 3000);
-
+        fetchData();
+        fetchMetaData();
+        socket.on("receive_employee", (message) => {
+            fetchData();
+        });
         return () => {
-            clearInterval(interval); // เมื่อ component unmount ให้หยุดการเรียก fetchData
+            socket.off("receive_employee");
         };
     }, []);
 
@@ -99,42 +98,32 @@ export default function page() {
         const formData = new FormData(event.target)
         const entries = [...formData.entries()];
         const data = Object.fromEntries(entries);
-        // console.log('----');
-        // console.log(data);
-        // console.log("oooooooooooooo");
-        // console.log(dataintable);
-        // console.log("oooooooooooooo");
-        // console.log({ data, product });
-        // console.log('----');
 
         try {
             const response = await axios.post(`${process.env.NEXT_PUBLIC_IP}/users/admin/po/api`,
                 { key: [data, dataintable] }
             );
             const newData = await response.data;
-            console.log(newData);
         } catch (error) {
             console.error("Error fetching data:", error);
         }
     }
 
     const handleDelete = (rowId) => {
-        console.log(rowId);
         setaDataintable(dataintable.filter((row) => row.p_id !== rowId));
     };
 
     const handleAdd = () => {
-        console.log('come in');
         if (selectedProductId != '' && quantity != '') {
-            setaDataintable(dataintable => [...dataintable, {
-                p_id: selectedProductId,
-                quantity: quantity,
-            }]);
-            console.log("lllllllllllllllllllll");
-            console.log(dataintable);
-            console.log("lllllllllllllllllllll");
-        } else {
-            console.log('heehee');
+            product.forEach(element => {
+                if (element.p_id == selectedProductId) {
+                    setaDataintable(dataintable => [...dataintable, {
+                        p_id: selectedProductId,
+                        p_name: element.p_name,
+                        quantity: quantity,
+                    }]);
+                }
+            })
         }
     };
 
@@ -281,7 +270,9 @@ export default function page() {
                             </tbody>
                         </table>
                     </div>
-                    <button type='submit' className='btn btn-info text-white mt-5 w-full' onClick={handleClick}>ส่ง</button>
+                    <div className='flex justify-center'>
+                        <button type='submit' className='btn btn-info my-5 text-white px-44' onClick={handleClick}>ส่ง</button>
+                    </div>
                 </form>
             </div>
 

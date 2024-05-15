@@ -10,7 +10,6 @@ export async function login(prevState,formData) {
     }
     const response = await axios.post(`${process.env.NEXT_PUBLIC_IP}/api/login`, rawFormData)
     if (response.data.message !== "fail") {
-        console.log("kkkkkkkkkkkkkkkkk");
         cookies().set('token',response.data.message)
         redirect('/users/admin')
     }

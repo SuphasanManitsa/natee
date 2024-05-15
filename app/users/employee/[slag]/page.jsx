@@ -1,65 +1,49 @@
 'use client'
 import React, { useState, useEffect } from 'react'
-import { addemp } from './action'
-import Swal from 'sweetalert2'
 import Link from 'next/link'
 import axios from 'axios'
+import { io } from 'socket.io-client';
+
+const socket = io();
 
 export default function page({ params }) {
     const [mydata, setMyData] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
 
-    useEffect(() => {
-        const fetchData = async () => {
-            console.log("asssssssdsdsdsdsdsdsdsd");
+    async function fetchData() {
             try {
                 const response = await axios.post(`${process.env.NEXT_PUBLIC_IP}/users/employee/[slag]/api`, {
                     po_id: params.slag,
                 });
                 const newData = response.data
-                console.log(newData);
-                console.log("plplplplplplplplplplplpl");
                 setMyData(newData);
             } catch (error) {
                 console.error("Error fetching data:", error);
             }
-        };
+    };
 
-        // เรียกใช้ fetchData ทุกๆ 3 วินาที
-        const interval = setInterval(fetchData, 3000);
-
-        return () => {
-            clearInterval(interval); // เมื่อ component unmount ให้หยุดการเรียก fetchData
-        };
+    useEffect(() => {
+        fetchData();
     }, []);
 
     const handleSearch = (event) => {
         setSearchTerm(event.target.value);
     }
 
-    const handleClick = () => {
-        Swal.fire({
-            title: 'ส่งสำเร็จ!',
-            text: 'กด OK เพื่อดำเนินการต่อ',
-            icon: 'success',
-            confirmButtonText: 'OK'
-        })
-    }
-
     async function handleClickCheckbox(index, orderStatus) {
         const newData = [...mydata]; // สร้างข้อมูลใหม่จากข้อมูลเดิม
         newData[index].order_status = orderStatus === 1 ? 0 : 1; // สลับค่า order_status
+        console.log(newData);
         setMyData(newData); // อัปเดตข้อมูลใหม่ใน state
 
         try {
             const response = await axios.post(`${process.env.NEXT_PUBLIC_IP}/users/employee/[slag]/api/onchange`, {
-                data: mydata,
+                data: newData,
             });
-            console.log(response.data);
         } catch (error) {
             console.error("Error fetching data:", error);
         }
-        
+        socket.emit("send_employee", 'send');
     };
 
     return (
@@ -109,10 +93,7 @@ export default function page({ params }) {
 
 
 
-            <form action={addemp}>
-                <button type='submit' className='btn btn-info text-white mt-5' onClick={handleClick}>ส่ง</button>
-                <button type='reset' className='btn btn-info text-white mx-5'>reset</button>
-            </form>
+            
             <div className="flex justify-center">
                 <Link href="../admin"><button className='btn btn-info my-5 text-white px-40'>ย้อนกลับ</button></Link>
             </div>

@@ -3,48 +3,35 @@ import React, { useState, useEffect } from 'react'
 import { addemp } from './action'
 import Swal from 'sweetalert2'
 import Link from 'next/link'
-
+import axios from 'axios'
 export default function page() {
     const [mydata, setMyData] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
 
+    async function fetchData() {
+        try {
+            const response = await axios.get(`${process.env.NEXT_PUBLIC_IP}/users/admin/addemployee/api`);
+            setMyData(response.data);
+        } catch (error) {
+            console.error("Error fetching data:", error);
+        }
+    }
     useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const response = await fetch(`${process.env.NEXT_PUBLIC_IP}/users/admin/addemployee/api`);
-                if (!response.ok) {
-                    throw new Error("Failed to fetch data");
-                }
-                const newData = await response.json();
-                setMyData(newData);
-            } catch (error) {
-                console.error("Error fetching data:", error);
-            }
-        };
-
-        // เรียกใช้ fetchData ทุกๆ 3 วินาที
-        const interval = setInterval(fetchData, 3000);
-
-        return () => {
-            clearInterval(interval); // เมื่อ component unmount ให้หยุดการเรียก fetchData
-        };
+        fetchData();
     }, []);
 
     const handleSearch = (event) => {
         setSearchTerm(event.target.value);
     }
 
-    const filteredData = mydata.filter((data) => {
-        return Object.values(data).join(" ").toLowerCase().includes(searchTerm.toLowerCase());
-    });
-
-    const handleClick = () => {
+    async function handleClick() {
+        await fetchData();
         Swal.fire({
             title: 'ส่งสำเร็จ!',
             text: 'กด OK เพื่อดำเนินการต่อ',
             icon: 'success',
             confirmButtonText: 'OK'
-        })
+        });
     }
 
     return (
@@ -75,7 +62,7 @@ export default function page() {
                     </thead>
                     <tbody>
                         {
-                            filteredData.map((data, index) => (
+                            mydata && mydata.map((data, index) => (
                                 <tr key={index} className='text-center'>
                                     <td>{data.emp_id}</td>
                                     <td>{data.emp_name}</td>
@@ -95,20 +82,20 @@ export default function page() {
             <hr />
             <form action={addemp}>
                 <div className="mt-5">
-                    <p className='text-2xl font-bold'>ชื่อพนักงาน :</p> <input type="text" name="nameemp" placeholder="นทีเทพซ่า" className="mt-3 input input-bordered input-info w-full max-w-xs" />
+                    <p className='text-2xl font-bold'>ชื่อพนักงาน :</p> <input type="text" name="nameemp" placeholder="XXX" className="mt-3 input input-bordered input-info w-full max-w-xs" />
                 </div>
                 <div className="mt-5">
-                    <p className='text-2xl font-bold'>username :</p> <input type="text" name="useremp" placeholder="Natee" className="mt-3 input input-bordered input-info w-full max-w-xs" />
+                    <p className='text-2xl font-bold'>username :</p> <input type="text" name="useremp" placeholder="XXX" className="mt-3 input input-bordered input-info w-full max-w-xs" />
                 </div>
                 <div className="mt-5">
-                    <p className='text-2xl font-bold'>password :</p> <input type="password" name="passwordemp" placeholder="1234" className="mt-3 input input-bordered input-info w-full max-w-xs" />
+                    <p className='text-2xl font-bold'>password :</p> <input type="password" name="passwordemp" placeholder="XXXX" className="mt-3 input input-bordered input-info w-full max-w-xs" />
                 </div>
                 <div className="mt-5">
                     <p className='text-2xl font-bold'>คำแหน่งพนักงาน :</p>
                     <select name="roleemp" className="select select-info w-full max-w-xs mt-3">
                         <option disabled>เลือกตำแหน่ง</option>
                         <option value="1">แอดมิน</option>
-                        <option value="2">สมาชิกยกของ</option>
+                        <option value="2">สมาชิกแพ็คของ</option>
 
                     </select>
                 </div>

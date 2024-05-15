@@ -16,6 +16,4 @@ export async function addemp(formData) {
   `, [idemp, nameemp, useremp, passwordemp, roleemp]);
 
   await db.end();
-  
-  console.log(rows);
 }
